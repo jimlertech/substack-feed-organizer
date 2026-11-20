@@ -1,0 +1,32 @@
+{
+    "manifest_version": 3,
+    "name": "Feed Organizer for Substack",
+    "short_name": "Feed Organizer",
+    "version": "1.0.0",
+    "description": "Sort your Substack Home feed and Subscriptions into your own publisher groups, with date filters, read marks and keyboard shortcuts.",
+    "homepage_url": "https://github.com/jimlertech/substack-feed-organizer",
+    "icons": {
+        "16": "icons/icon-16.png",
+        "32": "icons/icon-32.png",
+        "48": "icons/icon-48.png",
+        "128": "icons/icon-128.png"
+    },
+    "permissions": ["storage"],
+    "host_permissions": ["https://substack.com/*"],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["https://substack.com/*"],
+            "js": ["width-early.js"],
+            "css": ["content.css"],
+            "run_at": "document_start"
+        },
+        {
+            "matches": ["https://substack.com/*"],
+            "js": ["core.js", "content.js"],
+            "run_at": "document_idle"
+        }
+    ]
+}

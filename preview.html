@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en" class="dark-mode">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+        <meta name="theme-color" content="#161718">
+        <title>Substack Publisher Groups preview</title>
+        <link rel="stylesheet" href="content.css">
+        <style>
+            :root { color-scheme: dark; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: #161718; color: #eeeeee; }
+            :root:not(.dark-mode) { color-scheme: light; background: #ffffff; color: #363737; }
+            * { box-sizing: border-box; }
+            body { margin: 0; }
+            header { display: flex; justify-content: space-between; padding: 16px 20px; }
+            header button { border: 1px solid #77777766; border-radius: 8px; background: transparent; color: inherit; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+            main { max-width: 600px; margin: 0 auto; padding: 18px 16px 40px; box-sizing: content-box; }
+            .tabs { display: inline-flex; gap: 4px; margin-bottom: 12px; padding: 3px; border: 1px solid #313333; border-radius: 8px; }
+            :root:not(.dark-mode) .tabs { border-color: #dddddd; }
+            .tabs button { height: 28px; border: 0; border-radius: 6px; background: transparent; color: #777777; padding: 0 8px; font: inherit; font-size: 13px; font-weight: 600; }
+            .tabs button:first-child { background: #232525; color: #eeeeee; }
+            :root:not(.dark-mode) .tabs button:first-child { background: #f0f0f0; color: #363737; }
+            .pageStack { display: grid; gap: 0; }
+            .reader2-post-container { border-bottom: 1px solid #313333; padding: 16px 0; }
+            :root:not(.dark-mode) .reader2-post-container { border-color: #dddddd; }
+            .reader2-inbox-post { display: block; color: inherit; text-decoration: none; }
+            .reader2-post-head { display: flex; gap: 12px; color: #777777; font-size: 12px; letter-spacing: 0.3px; text-transform: uppercase; }
+            .reader2-post-head a { color: inherit; text-decoration: none; }
+            .post-title { display: block; margin: 10px 0 6px; color: inherit; font-size: 16px; font-weight: 700; text-decoration: none; }
+            .post-description { color: #777777; line-height: 1.5; font-size: 14px; }
+            @media (max-width: 390px) { main { padding-inline: 12px; } }
+        </style>
+        <script>
+            window.__SUBSTACK_ORGANIZER_PREVIEW__ = true;
+            // Stand-in for Substack's signed-in letter shortcuts: cancels "e" unless the target is a text field.
+            document.addEventListener("keydown", (event) => {
+                const target = event.target;
+                const typing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement;
+                if (event.key === "e" && !typing) {
+                    event.preventDefault();
+                }
+            });
+        </script>
+        <script src="width-early.js"></script>
+        <script src="preview.js" defer></script>
+        <script src="core.js" defer></script>
+        <script src="content.js" defer></script>
+    </head>
+    <body>
+        <header><strong>Subscriptions</strong><button type="button" onclick="document.documentElement.classList.toggle('dark-mode')">Toggle Substack light/dark</button></header>
+        <div class="reader-nav-page">
+        <main class="reader-nav-center">
+            <nav class="tabs" aria-label="Inbox views">
+                <button>All</button><button>Listen</button><button>Paid</button><button>Saved</button><button>History</button>
+            </nav>
+            <div class="pageStack">
+                <div class="visibility-check">
+                    <div class="reader2-post-container">
+                        <article class="reader2-inbox-post">
+                            <div class="reader2-post-head"><a href="https://example-tech.substack.com">Example Tech</a><span>9:02 AM</span></div>
+                            <a class="post-title" href="https://example-tech.substack.com/p/small-language-models" onclick="event.preventDefault()">A practical guide to small language models</a>
+                            <div class="post-description">A sample inbox item used to test publisher groups.</div>
+                        </article>
+                    </div>
+                </div>
+                <div class="visibility-check">
+                    <div class="reader2-post-container">
+                        <article class="reader2-inbox-post">
+                            <div class="reader2-post-head"><a href="https://markets.example.com">Market Notes</a><span>8:05 AM</span></div>
+                            <a class="post-title" href="https://markets.example.com/p/latest-earnings" onclick="event.preventDefault()">What changed in the latest earnings reports</a>
+                            <div class="post-description">Another sample entry for the local preview.</div>
+                        </article>
+                    </div>
+                </div>
+                <div class="visibility-check">
+                    <div class="reader2-post-container">
+                        <article class="reader2-inbox-post">
+                            <div class="reader2-post-head"><a href="https://example-tech.substack.com">Example Tech</a><span>Nov 18</span></div>
+                            <a class="post-title" href="https://example-tech.substack.com/p/code-review-questions" onclick="event.preventDefault()">Five questions to ask before a code review</a>
+                            <div class="post-description">A second post from the same publisher.</div>
+                        </article>
+                    </div>
+                </div>
+                <div class="visibility-check">
+                    <div class="reader2-post-container">
+                        <article class="reader2-inbox-post">
+                            <div class="reader2-post-head"><a href="https://markets.example.com">Market Notes</a><span>Nov 10</span></div>
+                            <a class="post-title" href="https://markets.example.com/p/quarter-look-back" onclick="event.preventDefault()">A look back at the quarter</a>
+                            <div class="post-description">An older post for testing the date filter.</div>
+                        </article>
+                    </div>
+                </div>
+                <div class="visibility-check">
+                    <div class="reader2-post-container">
+                        <article class="reader2-inbox-post">
+                            <div class="reader2-post-head"><a href="https://example-tech.substack.com">Example Tech</a><span>Sep 2, 2025</span></div>
+                            <a class="post-title" href="https://example-tech.substack.com/p/archive-post" onclick="event.preventDefault()">An archive post from last year</a>
+                            <div class="post-description">Shown only with Any time.</div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </main>
+        </div>
+    </body>
+</html>

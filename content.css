@@ -1,0 +1,328 @@
+[data-substack-organizer-hidden="true"] {
+    display: none !important;
+}
+
+/* Posts carry video players and embeds, so laying out dozens at once (when a filter change shows them)
+   took up to a second. Posts off screen now skip layout and paint until scrolled near; the browser
+   remembers each post's last size so the scrollbar stays steady. */
+[data-substack-organizer-card] {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 480px;
+}
+
+/* Subscriptions rows are short; a Home-sized estimate made the scrollbar jump as rows were drawn. */
+.reader2-post-container[data-substack-organizer-card] {
+    contain-intrinsic-size: auto 120px;
+}
+
+/* Posts already opened are dimmed (when "Hide read posts" is off). */
+[data-substack-organizer-read="true"] {
+    opacity: 0.35;
+}
+
+/* Group label above each post in All publishers, drawn by CSS so Substack's own markup isn't changed. */
+[data-substack-organizer-group]:not([data-substack-organizer-group=""])::before {
+    content: attr(data-substack-organizer-group);
+    display: inline-block;
+    width: fit-content;
+    align-self: flex-start;
+    margin: 10px 0 2px;
+    padding: 1px 0;
+    border: 0;
+    border-bottom: 1px solid #ff6719;
+    border-radius: 0;
+    color: #777777;
+    font: 600 11px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* The post selected with the j and k keys: a bar in the margin to its left. The post opts out of
+   content-visibility, whose paint containment would clip a mark drawn outside it. */
+[data-substack-organizer-current="true"] {
+    position: relative;
+    content-visibility: visible;
+}
+
+[data-substack-organizer-current="true"]::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -14px;
+    width: 2px;
+    background: rgb(255 103 25 / 70%);
+    pointer-events: none;
+}
+
+/* While a filter is on, posts stay hidden until the extension has checked them and marked them as shown,
+   so newly loaded posts never flash on screen before they're filtered. Home posts are marked by the
+   MutationObserver before the next paint, so only the Inbox's container class needs a catch-all here
+   (a broad [class*] Home selector with a :not(... *) ancestor test was costly to restyle). */
+html[data-substack-organizer-filtering] [data-substack-organizer-feed] .reader2-post-container:not([data-substack-organizer-hidden="false"]) {
+    display: none !important;
+}
+
+/* Substack's loading skeletons and spinners in the feed list, marked by the extension while a filter is on. */
+html[data-substack-organizer-filtering] [data-substack-organizer-extra="hidden"] {
+    display: none !important;
+}
+
+/* While loading a date range, posts are hidden so the page stays short and Substack keeps loading.
+   Substack's own item selectors are included so new posts don't show before they're marked. */
+html[data-substack-organizer-loading] [data-substack-organizer-card],
+html[data-substack-organizer-loading] [data-substack-organizer-feed] .reader2-post-container {
+    display: none !important;
+}
+
+[data-substack-organizer-panel-hidden="true"],
+html:not([data-substack-organizer-paused]) [data-substack-organizer-suggestion="true"] {
+    display: none !important;
+}
+
+/* Page-load overlay: the page content stays transparent until the extension has filtered it, then fades in. */
+.reader-nav-page {
+    transition: opacity 0.6s ease-out;
+}
+
+html[data-substack-organizer-booting] .reader-nav-page {
+    opacity: 0 !important;
+    transition: none;
+}
+
+/* The ring shows during the page-load overlay and while posts load in the background (for example after
+   opening Subscriptions from the left nav, which doesn't reload the page). It appears only after 250ms,
+   so fast loads never flash it. */
+html[data-substack-organizer-booting]::after,
+html[data-substack-organizer-loading]::after {
+    content: "";
+    position: fixed;
+    z-index: 2147483000;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    box-sizing: border-box;
+    border: 3px solid rgb(128 128 128 / 25%);
+    border-top-color: #363737;
+    border-radius: 50%;
+    pointer-events: none;
+    animation:
+        substack-organizer-ring-in 0.6s ease-out 0.25s backwards,
+        substack-organizer-spin 1s linear infinite;
+}
+
+html.dark-mode[data-substack-organizer-booting]::after,
+html.dark-mode[data-substack-organizer-loading]::after {
+    border-top-color: #eeeeee;
+}
+
+
+@keyframes substack-organizer-ring-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes substack-organizer-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reader-nav-page {
+        transition: none;
+    }
+
+    html[data-substack-organizer-booting]::after,
+    html[data-substack-organizer-loading]::after {
+        animation: substack-organizer-ring-in 0s 0.25s backwards;
+    }
+}
+
+/* Each post's invisible hover toolbar extends ~20px above the post into this bar. The bar stays pinned to
+   the top of the window while the feed scrolls under it. */
+#substack-publisher-groups-root {
+    position: relative;
+    z-index: 3;
+}
+
+/* The pinned bar and rows reach 16px past the column on each side, so the selected post's bar (14px to its
+   left) slides under them while scrolling instead of showing beside them. */
+html:not([data-substack-organizer-paused]) #substack-publisher-groups-root {
+    position: sticky;
+    top: 0;
+    box-shadow: -16px 0 0 var(--substack-organizer-page-bg, transparent), 16px 0 0 var(--substack-organizer-page-bg, transparent);
+}
+
+#substack-publisher-groups-root[data-manager-open] {
+    z-index: 2147482000;
+}
+
+/* Substack's own rows above the bar (tabs on Subscriptions; the post box and feed picker on Home), pinned
+   with it. Each row's top offset is set inline so they stack. */
+html:not([data-substack-organizer-paused]) [data-substack-organizer-pinned] {
+    position: sticky;
+    z-index: 4;
+    background: var(--substack-organizer-page-bg, transparent);
+    box-shadow: -16px 0 0 var(--substack-organizer-page-bg, transparent), 16px 0 0 var(--substack-organizer-page-bg, transparent);
+}
+
+/* The gap kept above Home's pinned post box is filled with the page's background, so posts scrolling up
+   don't show through it. */
+html:not([data-substack-organizer-paused]) [data-substack-organizer-pinned][data-substack-organizer-pin-gap] {
+    --sfo-gap: calc(-1 * var(--substack-organizer-pin-gap, 0px));
+    box-shadow:
+        -16px 0 0 var(--substack-organizer-page-bg, transparent),
+        16px 0 0 var(--substack-organizer-page-bg, transparent),
+        0 var(--sfo-gap) 0 var(--substack-organizer-page-bg, transparent),
+        -16px var(--sfo-gap) 0 var(--substack-organizer-page-bg, transparent),
+        16px var(--sfo-gap) 0 var(--substack-organizer-page-bg, transparent);
+}
+
+/* .reader-nav-center is the Inbox column; data-substack-organizer-column marks Home's at runtime.
+   min(..., 100%) keeps a widened column inside narrower windows. */
+html[data-substack-organizer-width="wide"] .reader-nav-center,
+html[data-substack-organizer-width="wide"] [data-substack-organizer-column] {
+    max-width: min(960px, 100%) !important;
+}
+
+html[data-substack-organizer-width="full"] .reader-nav-center,
+html[data-substack-organizer-width="full"] [data-substack-organizer-column] {
+    max-width: min(1400px, 100%) !important;
+}
+
+/* Note overlay (o / Enter on a Note without an article). Matches Substack's own reader panel: right of the
+   left navigation, a 12px margin, a framed panel with a 12px radius and Substack's shadow, a translucent
+   72px header with a divider, and the post in a 600px column. Colors come from the page (set inline). */
+#substack-organizer-note-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 12;
+    display: flex;
+    padding: 12px;
+    background: var(--sfo-bg);
+    color: var(--sfo-text);
+}
+
+.substack-organizer-note-frame {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--sfo-line);
+    border-radius: 12px;
+    background: var(--sfo-bg);
+    box-shadow: rgb(0 0 0 / 15%) 0 0 24px 0, rgb(0 0 0 / 25%) 0 4px 12px 0, rgb(0 0 0 / 45%) 0 2px 6px 0;
+}
+
+.substack-organizer-note-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    display: flex;
+    box-sizing: border-box;
+    height: 73px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--sfo-line);
+    background: var(--sfo-header);
+    backdrop-filter: blur(12px);
+}
+
+.substack-organizer-note-button {
+    display: inline-flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: var(--sfo-button);
+    color: var(--sfo-text);
+    cursor: pointer;
+}
+
+.substack-organizer-note-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 88px 16px 32px;
+    outline: none;
+}
+
+.substack-organizer-note-column {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    #substack-organizer-note-overlay {
+        left: 0 !important;
+        padding: 0;
+    }
+
+    .substack-organizer-note-frame {
+        border: 0;
+        border-radius: 0;
+    }
+}
+
+/* While the Note overlay is open, the left navigation shrinks to an 80px icon strip, as Substack does for its
+   reader: labels hidden and each item reduced to its 48px icon. */
+html[data-substack-organizer-note-open] [aria-label="Main navigation"] {
+    width: 80px !important;
+    overflow: hidden !important;
+}
+
+html[data-substack-organizer-note-open] [aria-label="Main navigation"] :is(a, button) {
+    width: 48px !important;
+    min-width: 48px !important;
+    overflow: hidden !important;
+    justify-content: center !important;
+}
+
+html[data-substack-organizer-note-open] [aria-label="Main navigation"] :is(a, button) > [class*="flex-grow"] {
+    display: none !important;
+}
+
+html[data-substack-organizer-note-open] [aria-label="Main navigation"] a > svg {
+    display: none !important;
+}
+
+/* Create: Substack's collapsed version is a 40px square with a plus; the expanded one has a label and a
+   dropdown chevron, so both are hidden and the plus is drawn. */
+html[data-substack-organizer-note-open] [aria-label="Main navigation"] button:has(> svg) {
+    position: relative !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px !important;
+    margin-left: 4px !important;
+    padding: 0 !important;
+    font-size: 0 !important;
+    text-indent: 0 !important;
+}
+
+html[data-substack-organizer-note-open] [aria-label="Main navigation"] button:has(> svg) > svg {
+    display: none !important;
+}
+
+html[data-substack-organizer-note-open] [aria-label="Main navigation"] button:has(> svg)::after {
+    content: "+";
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #ffffff;
+    font: 400 26px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
